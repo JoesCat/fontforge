@@ -69,6 +69,15 @@ unichar_t fontsnf[] = { 'a','p','p','l','i','c','a','t','i','o','n','/','x','-',
 //unichar_t fonttexfm[] = { 'a','p','p','l','i','c','a','t','i','o','n','/','x','-','t','e','x','-','t','f','m', '\0' }; /* *.tfm */
 
 #ifdef __Mac
+#ifdef _MAC_10_8FC
+#include <CarbonCore/Files.h>
+#else
+#ifdef _MAC_10_7FC
+#include </Developer/Headers/FlatCarbon/Files.h>
+#else
+/*# probably an older file here #include <somethingolder.h> */
+#endif
+#endif
 #include <carbon.h>
 #define CHR(ch1,ch2,ch3,ch4) (((ch1)<<24)|((ch2)<<16)|((ch3)<<8)|(ch4))
 

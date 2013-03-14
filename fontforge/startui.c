@@ -53,6 +53,26 @@ extern uninm_names_db names_db; /* Unicode character names and annotations datab
 #undef GTimer
 
 #ifdef __Mac
+
+#ifdef _MAC_10_8FC
+#include <CarbonCore/Files.h>
+#else
+#ifdef _MAC_10_7FC
+#include </Developer/Headers/FlatCarbon/Files.h>
+#else
+/*# probably an older file here #include <somethingolder.h> */
+#endif
+#endif
+#ifdef _MAC_10_8CE
+#include <HIToolbox/CarbonEvents.h>
+#else
+#ifdef _MAC_10_7CE
+#include </Developer/Headers/FlatCarbon/CarbonEvents.h>
+#else
+/*# probably an older file here #include <somethingolder.h> */
+#endif
+#endif
+
 extern void setup_cocoa_app();
 #endif
 

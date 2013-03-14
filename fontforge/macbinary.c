@@ -37,6 +37,15 @@
 #include "psfont.h"
 #if __Mac
 # include <ctype.h>
+#ifdef _MAC_10_8FC
+#include <CarbonCore/Files.h>
+#else
+#ifdef _MAC_10_7FC
+#include </Developer/Headers/FlatCarbon/Files.h>
+#else
+/*# probably an older file here #include <somethingolder.h> */
+#endif
+#endif
 # include "carbon.h"
 #else
 # include <utype.h>

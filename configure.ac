@@ -281,6 +281,24 @@ if test x"${i_do_want_iconv}" = xyes; then
    AC_CHECK_HEADERS([iconv.h])
 fi
 
+# Check for Mac headers and set some flags accordingly, go latest -> oldest
+#ifdef __Mac
+# "CarbonCore/Files.h", "/Developer/Headers/FlatCarbon/Files.h",....
+AC_CHECK_HEADERS([CarbonCore/Files.h],[AC_DEFINE([_MAC_10_8FC],1,[Using 10.8SDK CarbonCore Files.h])],
+   [
+   AC_CHECK_HEADERS([/Developer/Headers/FlatCarbon/Files.h],[AC_DEFINE([_MAC_10_7FC],1,[Using 10.7SDK FlatCarbon Files.h])],
+      [
+   ])
+])
+
+AC_CHECK_HEADERS([HIToolbox/CarbonEvents.h],[AC_DEFINE([_MAC_10_8CE],1,[Using 10.8SDK CarbonEvents.h])],
+[
+  AC_CHECK_HEADERS([/Developer/Headers/FlatCarbon/CarbonEvents.h],[AC_DEFINE([_MAC_10_7CE],1,[Using 10.7SDK CarbonEvents.h])],
+  [
+  ])
+])
+#endif
+
 #--------------------------------------------------------------------------
 #
 # Checks for typedefs, structures, and compiler characteristics.
