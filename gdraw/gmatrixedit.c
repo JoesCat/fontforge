@@ -900,6 +900,7 @@ static int GME_SetValue(GMatrixEdit *gme,GGadget *g ) {
     char *end="";
     char *str = GGadgetGetTitle8(g), *pt;
     int kludge;
+fprintf(stderr,"GME_SetValue c%d r%d\n",c,r);
 
     switch ( gme->col_data[c].me_type ) {
       case me_enum:
@@ -1278,7 +1279,7 @@ static void GME_EnumDispatch(GWindow gw, GMenuItem *mi, GEvent *e) {
 return;
 
     gme->data[gme->active_row*gme->cols+gme->active_col].u.md_ival = (intpt) mi->ti.userdata;
-
+fprintf(stderr,"GME_EnumDispatch\n");
     if ( gme->finishedit != NULL )
 	(gme->finishedit)(&gme->g,gme->active_row,gme->active_col,gme->wasnew);
     GME_AdjustCol(gme,gme->active_col);
@@ -1327,7 +1328,7 @@ return;
 	gme->data[r*gme->cols+c].u.md_str = copy( buf );
     } else
 	gme->data[r*gme->cols+c].u.md_str = u2utf8_copy( mi->ti.text );
-
+fprintf(stderr,"GME_EnumStringDispatch\n");
     if ( gme->finishedit != NULL )
 	(gme->finishedit)(&gme->g,r,c,gme->wasnew);
     GME_AdjustCol(gme,c);
@@ -1449,6 +1450,7 @@ return;
 	    /*  do that for me */
 	    free(gme->data[r*gme->cols+c].u.md_str);
 	    gme->data[r*gme->cols+c].u.md_str = ret;
+fprintf(stderr,"GMatrixEdit_StartSubGadgets\n");
 	    if ( gme->finishedit != NULL )
 		(gme->finishedit)(&gme->g,r,c,gme->wasnew);
 	    GDrawRequestExpose(gme->nested,NULL,false);
