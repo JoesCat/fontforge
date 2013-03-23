@@ -258,12 +258,14 @@ FONTFORGE_ARG_WITH_ZEROMQ
 FONTFORGE_ARG_WITH_LIBREADLINE
 
 # We have both libraries but did not choose which one to use yet
-if test x"${i_do_have_libuninameslist}" = xyes; then
-   if test x"${i_do_have_libunicodenames}" = xyes; then
-      i_do_have_libuninameslist=no
-      AC_DEFINE(_NO_LIBUNINAMESLIST)
-   fi
-fi
+#if test x"${i_do_have_libuninameslist}" = xyes; then
+#   if test x"${i_do_have_libunicodenames}" = xyes; then
+#      i_do_have_libuninameslist=no
+#      AC_DEFINE(_NO_LIBUNINAMESLIST)
+#   fi
+#fi
+# We need to force this not to run incase we have libuninameslist
+AC_DEFINE(_NO_LIBUNINAMESLIST)
 
 if test x"${i_do_have_cairo}" = xyes; then
    PKG_CHECK_MODULES([PANGOCAIRO],[pangocairo])
