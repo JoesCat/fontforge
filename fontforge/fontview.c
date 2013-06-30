@@ -7158,11 +7158,14 @@ static void FontViewOpenKids(FontView *fv) {
 }
 
 static FontView *__FontViewCreate(SplineFont *sf) {
-    FontView *fv = gcalloc(1,sizeof(FontView));
-    int i;
-    int ps = sf->display_size<0 ? -sf->display_size :
-	     sf->display_size==0 ? default_fv_font_size : sf->display_size;
+    volatile FontView *fv;
+    volatile int i, ps;
 
+    if ( (fv=(FontView *)calloc(1,sizeof(FontView)))==NULL )
+	return( NULL );
+
+    ps = sf->display_size<0 ? -sf->display_size :
+	     sf->display_size==0 ? default_fv_font_size : sf->display_size;
     if ( ps>200 ) ps = 128;
 
     /* Filename != NULL if we opened an sfd file. Sfd files know whether */
@@ -7212,7 +7215,7 @@ static FontView *__FontViewCreate(SplineFont *sf) {
 	    fv->b.map = CompactEncMap(EncMapCopy(fv->b.map),sf);
 	}
     }
-    fv->b.selected = gcalloc(fv->b.map->enccount,sizeof(char));
+    fv->b.selected=calloc(fv->b.map->enccount,sizeof(char));
     fv->user_requested_magnify = -1;
     fv->magnify = (ps<=9)? 3 : (ps<20) ? 2 : 1;
     fv->cbw = (ps*fv->magnify)+1;

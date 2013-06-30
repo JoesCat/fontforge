@@ -196,9 +196,9 @@ void ShowAboutScreen(void) {
 }
 
 static void SplashLayout() {
-    unichar_t *start, *pt, *lastspace;
     extern const char *source_modtime_str;
     extern const char *source_version_str;
+    volatile unichar_t *start, *pt, *lastspace;
 
     uc_strcpy(msg, "When my father finished his book on Renaissance printing (The Craft of Printing and the Publication of Shakespeare's Works) he told me that I would have to write the chapter on computer typography. This is my attempt to do so.");
 
@@ -339,7 +339,7 @@ return( true );
 }
 
 static void PingOtherFontForge(int argc, char **argv) {
-    struct argsstruct args;
+    volatile struct argsstruct args;
 
     args.next = 1;
     args.argc = argc;
@@ -500,7 +500,7 @@ static  OSErr install_apple_event_handlers(void) {
 
  /* some debugging code, for now */
  if ( getenv("HOME")!=NULL ) {
-  char buffer[1024];
+    char buffer[1024];
 #ifdef __VMS
     sprintf( buffer, "%s/_FontForge-LogFile.txt", getenv("HOME"));
 #else
@@ -528,7 +528,7 @@ static void install_mac_timer(void) {
 	    .001*kEventDurationSecond,.001*kEventDurationSecond,
 	    NewEventLoopTimerUPP(DoRealStuff), NULL,
 	    &timer);
-}	    
+}
 #endif
 
 static int splash_e_h(GWindow gw, GEvent *event) {
@@ -633,7 +633,7 @@ return( true );
 return( true );
 }
 
-static void  AddR(char *program_name, char *window_name, char *cmndline_val) {
+static void AddR(char *program_name, char *window_name, char *cmndline_val) {
 /* Add this command line value to this GUI resource.			*/
 /* These are the command line options expected when using this routine:	*/
 /*	-depth, -vc,-cmap or -colormap,-dontopenxdevices, -keyboard	*/
@@ -762,8 +762,8 @@ static void GrokNavigationMask(void) {
  */
 static void ffensuredir( const char* basedir, const char* dirname, mode_t mode ) {
     const int buffersz = PATH_MAX;
-    char buffer[buffersz+1];
-    
+    volatile char buffer[buffersz+1];
+
     snprintf(buffer,buffersz,"%s/%s", basedir, dirname );
     // ignore errors, this is just to help the user aftre all.
 #if !defined(__MINGW32__)
@@ -774,7 +774,7 @@ static void ffensuredir( const char* basedir, const char* dirname, mode_t mode )
 }
 
 static void ensureDotFontForgeIsSetup() {
-    char *basedir = GFileGetHomeDir();
+    volatile char *basedir = GFileGetHomeDir();
     if ( !basedir ) {
 	return;
     }
@@ -797,17 +797,12 @@ int fontforge_main( int argc, char **argv ) {
     extern const char *source_modtime_str;
     extern const char *source_version_str;
     const char *load_prefs = getenv("FONTFORGE_LOADPREFS");
-    int i;
-    int recover=2;
-    int any;
-    int next_recent=0;
+    volatile int i, recover=2, any, next_recent=0;
     GRect pos;
     GWindowAttrs wattrs;
-    char *display = NULL;
+    volatile char *display = NULL;
     FontRequest rq;
-    int ds, ld;
-    int openflags=0;
-    int doopen=0, quit_request=0;
+    volatile int ds, ld, openflags=0, doopen=0, quit_request=0;
 
     g_type_init();
 
@@ -833,7 +828,7 @@ int fontforge_main( int argc, char **argv ) {
     /* Must be done before we cache the current directory */
     /* Change to HOME dir if specified on the commandline */
     for ( i=1; i<argc; ++i ) {
-	char *pt = argv[i];
+	volatile char *pt = argv[i];
 	if ( pt[0]=='-' && pt[1]=='-' ) ++pt;
 	if (strcmp(pt,"-home")==0 || strncmp(pt,"-psn_",5)==0) {
 	    /* OK, I don't know what _-psn_ means, but to GW it means */
@@ -848,7 +843,7 @@ int fontforge_main( int argc, char **argv ) {
     /* Start X if they haven't already done so. Well... try anyway */
     /* Must be before we change DYLD_LIBRARY_PATH or X won't start */
     /* (osascript depends on a libjpeg which isn't found if we look in /sw/lib first */
-    int local_x = uses_local_x(argc,argv);
+    volatile int local_x = uses_local_x(argc,argv);
     if ( local_x==1 && getenv("DISPLAY")==NULL ) {
 	/* Don't start X if we're just going to quit. */
 	/* if X exists, it isn't needed. If X doesn't exist it's wrong */
@@ -873,8 +868,7 @@ int fontforge_main( int argc, char **argv ) {
 	putenv("DISPLAY=127.0.0.1:0.0");
     }
     if( getenv("LC_ALL")==NULL ){
-	char lang[8];
-	char env[32];
+	volatile char lang[8], env[32];
 	if( GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, lang, 8) > 0 ){
 	    strcpy(env, "LC_ALL=");
 	    strcat(env, lang);
@@ -901,9 +895,8 @@ int fontforge_main( int argc, char **argv ) {
 
 #if defined(__MINGW32__)
     {
-	char  path[MAX_PATH+4];
-	char  *c = path;
-	unsigned int  len = GetModuleFileNameA(NULL, path, MAX_PATH);
+	volatile char path[MAX_PATH+4], *c = path;
+	volatile unsigned int len = GetModuleFileNameA(NULL, path, MAX_PATH);
 	path[len] = '\0';
 	for(; *c; *c++) /* backslash to slash */
 	    if(*c == '\\')
@@ -928,7 +921,7 @@ int fontforge_main( int argc, char **argv ) {
     /*  or "POSIX". If they've mucked with the locale perhaps they know what  */
     /*  they are doing */
     {
-	int did_keybindings = 0;
+	volatile int did_keybindings = 0;
 	int useCommandKey = get_mac_x11_prop("enable_key_equivalents") <= 0;
 
 	if ( local_x && useCommandKey ) {
@@ -961,14 +954,14 @@ int fontforge_main( int argc, char **argv ) {
     textdomain("FontForge");
     GResourceUseGetText();
     {
-	char shareDir[PATH_MAX];
-	char* sd = getShareDir();
+	volatile char shareDir[PATH_MAX];
+	volatile char* sd = getShareDir();
 	strncpy( shareDir, sd, PATH_MAX );
 	if(!sd) {
 	    strcpy( shareDir, SHAREDIR );
 	}
 
-	char path[PATH_MAX];
+	volatile char path[PATH_MAX];
 	snprintf(path, PATH_MAX, "%s%s", shareDir, "/pixmaps" );
 	GGadgetSetImageDir( path );
 	
@@ -999,7 +992,7 @@ int fontforge_main( int argc, char **argv ) {
 	LoadPrefs();
     GrokNavigationMask();
     for ( i=1; i<argc; ++i ) {
-	char *pt = argv[i];
+	volatile char *pt = argv[i];
 	if ( pt[0]=='-' && pt[1]=='-' )
 	    ++pt;
 	if ( strcmp(pt,"-sync")==0 )
@@ -1150,14 +1143,14 @@ exit( 0 );
 	any = DoAutoRecoveryExtended( recover-1,
 				      DoAutoRecoveryPostRecover_PromptUserGraphically );
     }
-    
 
     openflags = 0;
     for ( i=1; i<argc; ++i ) {
-	char buffer[1025];
-	char *pt = argv[i];
+	volatile char buffer[1025], *pt;
 
 	GDrawProcessPendingEvents(NULL);
+
+	*pt = argv[i];
 	if ( pt[0]=='-' && pt[1]=='-' && pt[2]!='\0')
 	    ++pt;
 	if ( strcmp(pt,"-new")==0 ) {
@@ -1198,7 +1191,7 @@ exit( 0 );
 	    } else
 		GFileGetAbsoluteName(argv[i],buffer,sizeof(buffer));
 	    if ( GFileIsDir(buffer) || (strstr(buffer,"://")!=NULL && buffer[strlen(buffer)-1]=='/')) {
-		char *fname;
+		volatile char *fname;
 		fname = galloc(strlen(buffer)+strlen("/glyphs/contents.plist")+1);
 		strcpy(fname,buffer); strcat(fname,"/glyphs/contents.plist");
 		if ( GFileExists(fname)) {
