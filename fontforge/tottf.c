@@ -3761,13 +3761,19 @@ static void dumpstr(FILE *file,char *str) {
     } while ( *str++!='\0' );
 }
 
-static void dumpustr(FILE *file,char *utf8_str) {
-    unichar_t *ustr = utf82u_copy(utf8_str), *pt=ustr;
+static int dumpustr(FILE *file,char *utf8_str) {
+    unichar_t *ustr, *pt;
+
+    if ( utf8_str==NULL || (ustr=pt=utf82u_copy(utf8_str))==NULL )
+	return( -1 );
     do {
-	putc(*pt>>8,file);
-	putc(*pt&0xff,file);
+	if ( (putc(*pt>>8,file))<0 || (putc(*pt&0xff,file))<0 ) {
+	    free(ustr);
+	    return( -1 );
+	}
     } while ( *pt++!='\0' );
     free(ustr);
+    return( 0 );
 }
 
 static void dumppstr(FILE *file,const char *str) {
@@ -3883,7 +3889,10 @@ return;		/* Should not happen, but it did */
     ne->strid    = strid;
     ne->offset   = ftell(nt->strings);
     ne->len      = 2*utf82u_strlen(utf8name);
-    dumpustr(nt->strings,utf8name);
+    if ( dumpustr(nt->strings,utf8name) ) {
+	printf("FIXME=see issue2726 - error in tottf.c\n");
+	exit(-1);
+    };
     ++ne;
 
     if ( nt->format==ff_ttfsym ) {
