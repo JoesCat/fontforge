@@ -57,4 +57,15 @@ if ( b1 != 1 || b2 != 0 || b3 != 1 || b4 != 0 || b5 != 1 || b6 != 0 )
   Error("Expected boolean values of 1,0,1,0,1,0.")
 endif
 
+Print("Test valid (and invalid) vulgar fraction alt expansions.")
+e1 = ucVulChartGetLoc(0xbc)
+e2 = ucVulChartGetLoc(0x2152)
+e3 = ucVulChartGetAltCnt(e1)
+e4 = ucVulChartGetAltCnt(e2)
+e5 = ucVulChartGetAltCnt(1000)
+Print(e1,"_",e2,"_",e3,"_",e4,"_",e5)
+if ( e1 < 0 || e2 < 0 || e3 != 3 || e4 != 4 || e5 != -1 )
+  Error("Expected alt_expansion_count results of {3,4,-1}.")
+endif
+
 Print("All Tests done and valid.")

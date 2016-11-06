@@ -8325,6 +8325,44 @@ static void bOFracChartGetLoc(Context *c) {
 	c->error = ce_badargtype;
 }
 
+static void bVulChartGetAltCnt(Context *c) {
+    const char *pt;
+    long ch;
+
+    c->return_val.type = v_int;
+    if ( c->a.vals[1].type==v_str ) {
+	pt = c->a.vals[1].u.sval;
+	ch = utf8_ildb(&pt);
+	c->return_val.u.ival = VulgFrac_get_altC(ch);
+    } else if ( c->a.vals[1].type==v_int || c->a.vals[1].type==v_unicode )
+	c->return_val.u.ival = VulgFrac_get_altC(c->a.vals[1].u.ival);
+    else
+	c->error = ce_badargtype;
+}
+
+static void bVulChartGetAltVal(Context *c) {
+    const char *pt;
+    long ch1,ch2;
+
+    if ( c->a.vals[1].type==v_str ) {
+	pt = c->a.vals[1].u.sval;
+	ch1 = utf8_ildb(&pt);
+    } else if ( c->a.vals[1].type==v_int || c->a.vals[1].type==v_unicode )
+	ch1 = c->a.vals[1].u.ival;
+    else
+	c->error = ce_badargtype;
+
+    c->return_val.type = v_int;
+    if ( c->a.vals[2].type==v_str ) {
+	pt = c->a.vals[2].u.sval;
+	ch2 = utf8_ildb(&pt);
+	c->return_val.u.ival = VulgFrac_get_altA(ch1,ch2);
+    } else if ( c->a.vals[2].type==v_int || c->a.vals[2].type==v_unicode )
+	c->return_val.u.ival = VulgFrac_get_altA(ch1,c->a.vals[2].u.ival);
+    else
+	c->error = ce_badargtype;
+}
+
 static struct builtins {
     const char *name;
     void (*func)(Context *);
@@ -8681,6 +8719,8 @@ static struct builtins {
     { "ucLigChartGetLoc", bLigChartGetLoc, 1,2,0 },
     { "ucVulChartGetLoc", bVulChartGetLoc, 1,2,0 },
     { "ucOFracChartGetLoc", bOFracChartGetLoc, 1,2,0 },
+    { "ucVulChartGetAltCnt", bVulChartGetAltCnt, 1,2,0 },
+    { "ucVulChartGetAltVal", bVulChartGetAltVal, 1,3,0 },
     { NULL, 0, 0,0,0 }
 };
 

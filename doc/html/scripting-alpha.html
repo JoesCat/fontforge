@@ -3392,6 +3392,19 @@ SetGasp([8,2,16,1,65535,3])
 	    -1 if n<0 or n>=ucVulChartGetCnt(). Can execute with no current font.
 	    <BR>Note: Count depends on chart version built into FontForge.
 	  <DT>
+	    <A NAME="ucVulChartGetAltCnt">u</A>cVulChartGetAltCnt(n)
+	  <DD>
+	    Returns total count of Alternate Characters needed to make
+	    n=ucVulChartGetLoc(val). It can execute with no current font.
+	    See test129.pe for example scripting code.
+	    <BR>Note: [n] depends on chart version built into FontForge.
+	  <DT>
+	    <A NAME="ucVulChartGetAltVal">u</A>cVulChartGetAltVal(n,a)
+	  <DD>
+	    Returns Alternate Character[a] for n=ucVulChartGetLoc(val).
+	    It can execute with no current font. See test129.pe for example code.
+	    <BR>Note: [n] depends on chart version built into FontForge.
+	  <DT>
 	    <A NAME="UnicodeAnnotationFromLib">U</A>nicodeAnnotationFromLib(val)
 	  <DD>
 	    Returns the Unicode Annotations for this value as described by www.unicode.org.
