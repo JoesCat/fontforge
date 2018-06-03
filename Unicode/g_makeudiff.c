@@ -158,6 +158,15 @@ int main(int argc, char **argv) {
     /* get latest UnicodeData for comparisons */
     if ( (e=get_UnicodeData("UnicodeData.txt",tab_name,tabcodes,0,v)) ) goto mainerr;
     if ( (e=get_UnicodeData("UnicodeData10.txt",tab_name,tabcodes,10,v)) ) goto mainerr;
+    if ( (e=get_UnicodeData("UnicodeData9.txt",tab_name,tabcodes,9,v)) ) goto mainerr;
+    if ( (e=get_UnicodeData("UnicodeData8.txt",tab_name,tabcodes,8,v)) ) goto mainerr;
+    if ( (e=get_UnicodeData("UnicodeData7.txt",tab_name,tabcodes,7,v)) ) goto mainerr;
+    if ( (e=get_UnicodeData("UnicodeData63.txt",tab_name,tabcodes,6,v)) ) goto mainerr;
+    if ( (e=get_UnicodeData("UnicodeData52.txt",tab_name,tabcodes,5,v)) ) goto mainerr;
+    if ( (e=get_UnicodeData("UnicodeData41.txt",tab_name,tabcodes,4,v)) ) goto mainerr;
+    if ( (e=get_UnicodeData("UnicodeData-3.2.0.txt",tab_name,tabcodes,3,v)) ) goto mainerr;
+    if ( (e=get_UnicodeData("UnicodeData-2.1.9.txt",tab_name,tabcodes,2,v)) ) goto mainerr;
+    if ( (e=get_UnicodeData("UnicodeData-1.1.5.txt",tab_name,tabcodes,1,v)) ) goto mainerr;
 
 mainerr:
     for ( i=0; i<0x120000; ++i )
