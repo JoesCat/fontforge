@@ -21,18 +21,25 @@
 
 #define BUFFSIZE 1024
 
-long tab_code[0x120000];
+typedef struct {
+    long first,last,count;
+    long val[0x120000];
+} tab_codes;
+tab_codes tabcodes[11];
 char *tab_name[0x120000];
 
-/* Get latest Unicodedata.txt for main reference list*/
-static int get_UnicodeData(char *filenamein, char **tabname, int v) {
+/* if ver=0, then get latest Unicodedata.txt for main reference list, */
+/* else get codes from older Unicodedata.txt to compare to main list. */
+static int get_UnicodeData(char *filenamein, char **tabname, tab_codes *tabcode, int ver, int v) {
     FILE *infile;
     long i, count, lineno, firstu, lastu, unicode;
     char buffer[BUFFSIZE+1], *p, *end;
+    long val[0x120000];
 
     firstu = 10000000; lastu = -1; count = lineno = 0;
     buffer[BUFFSIZE]='\0';
     count = 0;
+    for ( i=0; i<0x120000; ++i ) val[i] = -1;
 
     if ( (infile=fopen(filenamein,"rb"))==NULL ) {
 	fprintf( stderr, "Can't find or read file %s\n", filenamein );
@@ -67,19 +74,40 @@ static int get_UnicodeData(char *filenamein, char **tabname, int v) {
 	while ( *end!='\0' && *end!=';') ++end;
 	*end = '\0';
 
-	if ( tabname[unicode]!=NULL ) {
-	    fprintf( stderr, "Error with file %s. Found line %d to have another copy of unicode 0x%lx followed by another name_string\nold=%s\nnew=%s\n", filenamein, lineno, unicode, tabname[unicode], p );
-	    fclose(infile);
-	    return( -5 );
-	}
-	if ( (tabname[unicode]=calloc(1,strlen(p)+1))==NULL ) {
-	    fprintf( stderr, "Error. No more memory.\n" );
-	    fclose(infile);
-	    return( -6 );
-	}
-	strcpy(tabname[unicode],p);
+	if ( ver ) {
+	    /* ver!=0, compare these codes with the current UnicodeData.txt names list */
+	    if ( val[unicode]!=-1 ) {
+		fprintf( stderr, "Error with file %s. Found line %d to point to an already in use unicode 0x%lx listed earlier\n", filenamein, lineno, unicode );
+		fclose(infile);
+		return( -7 );
+	    }
 
-	if ( v>1 ) fprintf( stdout, "value 0x%lx:%s\n", unicode, tabname[unicode] );
+	    if ( tabname[unicode]!=NULL && strcmp(p,tabname[unicode])==0 ) {
+		val[unicode] = unicode;
+	    } else {
+		for ( i=0; i<0x120000; ++i ) {
+		    if ( tabname[i]!=NULL && strcmp(p,tabname[i])==0 ) {
+			val[unicode] = i;
+			if ( v>1 ) fprintf( stdout, "mismatched 0x%lx points to value 0x%lx\n", unicode, i );
+		    }
+		}
+	    }
+	} else {
+	    /* ver==0, load initial UnicodeData.txt list into names for comparing afterwards */
+	    if ( tabname[unicode]!=NULL ) {
+		fprintf( stderr, "Error with file %s. Found line %d to have another copy of unicode 0x%lx followed by another name_string\nold=%s\nnew=%s\n", filenamein, lineno, unicode, tabname[unicode], p );
+		fclose(infile);
+		return( -5 );
+	    }
+	    if ( (tabname[unicode]=calloc(1,strlen(p)+1))==NULL ) {
+		fprintf( stderr, "Error. No more memory.\n" );
+		fclose(infile);
+		return( -6 );
+	    }
+	    strcpy(tabname[unicode],p);
+	}
+
+	if ( v>2 ) fprintf( stdout, "value 0x%lx:%s\n", unicode, p );
 
 	/* stats */
 	++count;
@@ -91,6 +119,14 @@ static int get_UnicodeData(char *filenamein, char **tabname, int v) {
     fclose(infile);
 
     if ( v ) fprintf( stdout, "Done %s, first code=0x%lx, last code=0x%lx, total count=%d\n", filenamein, firstu, lastu, count );
+
+    /* if done safely then transfer temp into tabcodes as new values else maintain old codes */
+    if ( ver ) {
+	tabcode[ver].first = firstu;
+	tabcode[ver].last = lastu;
+	tabcode[ver].count = count;
+	for ( i=0; i<0x120000; ++i ) tabcode[ver].val[i] = val[i];
+    }
     return( 0 );
 }
 
@@ -108,12 +144,22 @@ int main(int argc, char **argv) {
 	}
     }
 
-    for ( i=0; i<0x120000; ++i ) {
-	tab_code[i] = -1; tab_name[i] = NULL;
+    for ( i=0; i<0x120000; ++i )
+	tab_name[i] = NULL;
+
+    for ( e=0; e<11; ++e ) {
+	tabcodes[e].first = 10000000;
+	tabcodes[e].last = -1;
+	tabcodes[e].count = 0;
+	for ( i=0; i<0x120000; ++i )
+	    tabcodes[e].val[i] = -1;
     }
 
-    e = get_UnicodeData("UnicodeData.txt",tab_name,v);
+    /* get latest UnicodeData for comparisons */
+    if ( (e=get_UnicodeData("UnicodeData.txt",tab_name,tabcodes,0,v)) ) goto mainerr;
+    if ( (e=get_UnicodeData("UnicodeData10.txt",tab_name,tabcodes,10,v)) ) goto mainerr;
 
+mainerr:
     for ( i=0; i<0x120000; ++i )
 	if ( tab_name[i]!= NULL ) free(tab_name[i]);
 
