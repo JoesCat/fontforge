@@ -79,7 +79,12 @@ libgunicode_la_LDFLAGS = $(MY_CFLAGS) -version-info $(LIBGUNICODE_VERSION) \
 libgunicode_la_LIBADD = $(MY_LIBS)
 
 #--------------------------------------------------------------------------
+# makeudiff - unicodedata code version differences between latest and older
+EXTRA_PROGRAMS = g_makeudiff
+g_makeudiff_SOURCES = g_makeudiff.c
+noinst_PROGRAMS = g_makeudiff
 
+#--------------------------------------------------------------------------
 #dump_SOURCES = dump.c
 #makebuildtables_SOURCES = makebuildtables.c utype.c
 #makeutype_SOURCES = makeutype.c combiners.h
