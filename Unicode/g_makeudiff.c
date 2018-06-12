@@ -14,6 +14,12 @@
  * along with this program; if not, see http://www.gnu.org/licenses/
  */
 
+/* developer tool - this tool is mainly to see if there's differences */
+/* that might need attention between Unicode versions. This is also a */
+/* bit of a challenge seeing that older unicode tables are removed or */
+/* no longer available on the unicode website. Some tables are stable */
+/* such as Unicodedata.txt which increases in size with few overlaps. */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -155,7 +161,7 @@ int main(int argc, char **argv) {
 	    tabcodes[e].val[i] = -1;
     }
 
-    /* get latest UnicodeData for comparisons */
+    /* get latest UnicodeData for comparisons. */
     if ( (e=get_UnicodeData("UnicodeData.txt",tab_name,tabcodes,0,v)) ) goto mainerr;
     if ( (e=get_UnicodeData("UnicodeData10.txt",tab_name,tabcodes,10,v)) ) goto mainerr;
     if ( (e=get_UnicodeData("UnicodeData9.txt",tab_name,tabcodes,9,v)) ) goto mainerr;
@@ -167,6 +173,7 @@ int main(int argc, char **argv) {
     if ( (e=get_UnicodeData("UnicodeData-3.2.0.txt",tab_name,tabcodes,3,v)) ) goto mainerr;
     if ( (e=get_UnicodeData("UnicodeData-2.1.9.txt",tab_name,tabcodes,2,v)) ) goto mainerr;
     if ( (e=get_UnicodeData("UnicodeData-1.1.5.txt",tab_name,tabcodes,1,v)) ) goto mainerr;
+    /* UnicodeData data very stable up to here */
 
 mainerr:
     for ( i=0; i<0x120000; ++i )
